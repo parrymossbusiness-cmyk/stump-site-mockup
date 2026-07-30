@@ -501,14 +501,21 @@ section { padding: 64px 0; }
 }
 
 @media (max-width: 767px) {
-  /* Full-bleed to the true bottom of the screen (100svh accounts for the
-     mobile browser chrome so no white gap peeks through below the fold).
+  /* Full-bleed to the true bottom of the screen. 100svh locks to the
+     *smallest* possible viewport (Safari's toolbar fully expanded) — when
+     the toolbar later collapses to its compact floating state, the real
+     visible area is taller than that, leaving a gap of the next section's
+     white background peeking through above the toolbar. 100dvh tracks the
+     toolbar's actual current state instead, so it always matches; the svh
+     line stays first as a fallback for browsers without dvh support.
      hero-stump-poster-mobile.jpg is shot portrait with the stump/machine in
      the upper frame and plain yard below, so a top-biased crop keeps the
      subject fully in view regardless of exact phone aspect ratio. */
   .hero {
     height: 100svh;
+    height: 100dvh;
     min-height: 100svh;
+    min-height: 100dvh;
   }
   .hero-media img,
   .hero-media video {
