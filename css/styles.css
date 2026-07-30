@@ -494,6 +494,34 @@ section { padding: 64px 0; }
   .hero-reviews .header-reviews { font-size: 0.85rem; }
 }
 
+@media (max-width: 767px) {
+  /* On a narrow, tall viewport, object-fit:cover sized to container height
+     forces a huge upscale of a landscape photo, cropping out all but a thin
+     vertical sliver. Instead, size the image to its own aspect ratio (much
+     less crop, so more of the shot is visible) anchored to the top, and let
+     the hero's own dark background fill the rest of the true viewport height
+     — the existing scrim gradient blends the two so it still reads as one
+     continuous bleed to the bottom of the screen. */
+  .hero {
+    height: 100svh;
+    min-height: 100svh;
+    background: rgba(8, 12, 8, 1);
+  }
+  .hero-media {
+    inset: 0 0 auto 0;
+    height: auto;
+  }
+  .hero-media img,
+  .hero-media video {
+    position: relative;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-position: 50% 30%;
+  }
+  .hero-content { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .hero .hero-subhead { font-size: 0.85rem; margin-bottom: 1.3em; }
+}
+
 /* Interior page banner (smaller, non-full-viewport hero) */
 .page-banner {
   position: relative;

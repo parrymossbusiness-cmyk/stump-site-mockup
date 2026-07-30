@@ -104,19 +104,24 @@
   /* Hero background video: the <video> tag ships in the initial HTML with
      real muted/autoplay/playsinline attributes (Safari only grants autoplay
      reliably when those are present from page load, not added by script
-     after the fact) but its <source> elements start with no real src, so no
-     video bytes are ever requested. On desktop-width, motion-ok browsers we
-     wire up the sources, call .load()/.play(), and reveal it. Mobile and
-     reduced-motion users never trigger this — zero extra network cost. */
+     after the fact) but has no <source> children and no src at parse time,
+     so no video bytes are ever requested. On desktop-width, motion-ok
+     browsers we assign .src directly on the <video> element itself (Safari's
+     WebKit engine has a long-standing quirk where dynamically promoting
+     <source data-src> children and calling .load() is unreliable — it does
+     not consistently re-run resource selection against the new children;
+     setting video.src directly is the well-supported cross-browser pattern),
+     then call .load()/.play(). Mobile and reduced-motion users never trigger
+     this — zero extra network cost. */
   var heroVideo = document.querySelector('.hero-video');
   if (heroVideo) {
     var wantsMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var isWideEnough = window.matchMedia('(min-width: 1024px)').matches;
     if (wantsMotion && isWideEnough) {
-      var sources = heroVideo.querySelectorAll('source[data-src]');
-      for (var s = 0; s < sources.length; s++) {
-        sources[s].src = sources[s].getAttribute('data-src');
-      }
+      var canWebm = typeof heroVideo.canPlayType === 'function' &&
+        heroVideo.canPlayType('video/webm; codecs="vp9"') !== '';
+      var src = canWebm ? heroVideo.getAttribute('data-webm') : heroVideo.getAttribute('data-mp4');
+      heroVideo.src = src;
       heroVideo.load();
       heroVideo.classList.add('is-active');
       /* Force layout before play() — some browsers evaluate whether a video
