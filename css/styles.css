@@ -437,11 +437,6 @@ section { padding: 64px 0; }
 .hero-media video.is-active { display: block; }
 @media (min-width: 1024px) { .hero-media img, .hero-media video { object-position: 68% center; } }
 
-.hero-fallback-mobile { display: none; }
-@media (max-width: 767px) {
-  .hero-fallback-desktop { display: none; }
-  .hero-fallback-mobile { display: block; }
-}
 
 .mobile-break { display: none; }
 @media (max-width: 767px) { .mobile-break { display: block; } }
@@ -503,28 +498,36 @@ section { padding: 64px 0; }
 }
 
 @media (max-width: 767px) {
-  /* Full-bleed to the true bottom of the screen. 100svh/100dvh are the CSS
-     fallbacks (in case JS hasn't run yet), but WebKit has documented
-     inconsistencies recalculating dvh once Safari's toolbar collapses to
-     its compact floating state mid-session, which is what was leaving a
-     gap of the next section's white background peeking through above the
-     toolbar. --hero-vh (set in main.js from window.visualViewport, which
-     Safari keeps accurate to the toolbar's live state) wins as the last,
-     most specific declaration and is what actually drives this in practice.
-     hero-stump-poster-mobile.jpg is shot portrait with the stump/machine in
-     the upper frame and plain yard below, so a top-biased crop keeps the
-     subject fully in view regardless of exact phone aspect ratio. */
+  /* A pixel-precise viewport-unit height on .hero, paired with a separate
+     absolutely-positioned <img> sized to match it, has two independently
+     computed boxes that can drift out of sync (that's what caused the
+     gap). Using a plain CSS background-image on .hero itself instead
+     removes the second box entirely — the photo is .hero's own background,
+     so it always covers exactly whatever height the element ends up with,
+     no matter how that height is computed. min-height (a floor, not a
+     fixed value) guarantees at least a full screen with no risk of coming
+     up short. hero-stump-poster-mobile.jpg is shot portrait with the
+     stump/machine in the upper frame and plain yard below, so a top-biased
+     crop keeps the subject fully in view regardless of phone aspect ratio. */
   .hero {
-    height: 100svh;
-    height: 100dvh;
-    height: var(--hero-vh, 100dvh);
-    min-height: 100svh;
-    min-height: 100dvh;
-    min-height: var(--hero-vh, 100dvh);
+    height: auto;
+    min-height: 100vh;
+    background-image: url('/images/hero-stump-poster-mobile.jpg');
+    background-size: cover;
+    background-position: 50% 20%;
+    background-repeat: no-repeat;
   }
-  .hero-media img,
-  .hero-media video {
-    object-position: 50% 20%;
+  .hero-media { display: none; }
+  /* .hero-content normally sizes via height:100% of .hero, but that can't
+     resolve against .hero's height:auto above (percentage heights against
+     an auto-height parent compute as auto too) — it was collapsing to its
+     own content size and rendering at the top instead of bottom-anchored.
+     Sizing it directly to .hero's actual box via inset:0 sidesteps that
+     percentage-resolution rule entirely. */
+  .hero-content {
+    position: absolute;
+    inset: 0;
+    height: auto;
   }
   .hero-content { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .hero .hero-subhead { font-size: 0.85rem; margin-bottom: 1.3em; }
