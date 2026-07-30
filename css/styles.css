@@ -521,7 +521,7 @@ section { padding: 64px 0; }
     background-position: 50% 20%;
     background-repeat: no-repeat;
   }
-  .hero-media { display: none; }
+  .hero .hero-media { display: none; }
   /* .hero-content normally sizes via height:100% of .hero, but that can't
      resolve against .hero's height:auto above (percentage heights against
      an auto-height parent compute as auto too) — it was collapsing to its
