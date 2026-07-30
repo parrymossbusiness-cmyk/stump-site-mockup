@@ -121,6 +121,13 @@
       var canWebm = typeof heroVideo.canPlayType === 'function' &&
         heroVideo.canPlayType('video/webm; codecs="vp9"') !== '';
       var src = canWebm ? heroVideo.getAttribute('data-webm') : heroVideo.getAttribute('data-mp4');
+      /* Belt-and-suspenders: force the muted state as a JS property, not
+         just the parsed attribute. Muted autoplay is the one autoplay mode
+         every major browser (including Safari's per-site Auto-Play policy,
+         when not set to "Never Auto-Play") allows without a user gesture,
+         so this must be unambiguously true before play() is called. */
+      heroVideo.muted = true;
+      heroVideo.defaultMuted = true;
       heroVideo.src = src;
       heroVideo.load();
       heroVideo.classList.add('is-active');
@@ -131,8 +138,14 @@
       void heroVideo.offsetWidth;
       var playPromise = heroVideo.play();
       if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(function () {
-          /* Autoplay blocked for some reason; fall back to the poster image. */
+        playPromise.catch(function (err) {
+          /* Autoplay blocked for some reason; fall back to the poster image.
+             Logged so Safari's Web Inspector console shows the real reason
+             (e.g. a per-site "Never Auto-Play" setting) instead of a silent
+             failure that looks identical to every other possible cause. */
+          if (window.console && console.warn) {
+            console.warn('Hero video autoplay was blocked:', err && err.name, err && err.message);
+          }
           heroVideo.classList.remove('is-active');
         });
       }

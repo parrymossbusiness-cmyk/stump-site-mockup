@@ -435,6 +435,12 @@ section { padding: 64px 0; }
 .hero-media video.is-active { display: block; }
 @media (min-width: 1024px) { .hero-media img, .hero-media video { object-position: 68% center; } }
 
+.hero-fallback-mobile { display: none; }
+@media (max-width: 767px) {
+  .hero-fallback-desktop { display: none; }
+  .hero-fallback-mobile { display: block; }
+}
+
 .mobile-break { display: none; }
 @media (max-width: 767px) { .mobile-break { display: block; } }
 
@@ -495,28 +501,18 @@ section { padding: 64px 0; }
 }
 
 @media (max-width: 767px) {
-  /* On a narrow, tall viewport, object-fit:cover sized to container height
-     forces a huge upscale of a landscape photo, cropping out all but a thin
-     vertical sliver. Instead, size the image to its own aspect ratio (much
-     less crop, so more of the shot is visible) anchored to the top, and let
-     the hero's own dark background fill the rest of the true viewport height
-     — the existing scrim gradient blends the two so it still reads as one
-     continuous bleed to the bottom of the screen. */
+  /* Full-bleed to the true bottom of the screen (100svh accounts for the
+     mobile browser chrome so no white gap peeks through below the fold).
+     hero-stump-poster-mobile.jpg is shot portrait with the stump/machine in
+     the upper frame and plain yard below, so a top-biased crop keeps the
+     subject fully in view regardless of exact phone aspect ratio. */
   .hero {
     height: 100svh;
     min-height: 100svh;
-    background: rgba(8, 12, 8, 1);
-  }
-  .hero-media {
-    inset: 0 0 auto 0;
-    height: auto;
   }
   .hero-media img,
   .hero-media video {
-    position: relative;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-position: 50% 30%;
+    object-position: 50% 20%;
   }
   .hero-content { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .hero .hero-subhead { font-size: 0.85rem; margin-bottom: 1.3em; }
