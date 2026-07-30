@@ -1,4 +1,22 @@
 (function () {
+  /* Mobile hero height: CSS dvh should track Safari's toolbar as it
+     collapses to its compact floating state, but WebKit has documented
+     inconsistencies recalculating dvh after that transition happens mid-
+     session (as opposed to on initial load). window.visualViewport.height
+     (falling back to window.innerHeight) is the value Safari itself keeps
+     accurate to the toolbar's real, current state, so drive the hero's
+     height from that directly instead of trusting the CSS unit alone. */
+  function setHeroVh() {
+    var vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+    document.documentElement.style.setProperty('--hero-vh', vh + 'px');
+  }
+  setHeroVh();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setHeroVh);
+  } else {
+    window.addEventListener('resize', setHeroVh);
+  }
+
   var header = document.getElementById('site-header');
   var hamburger = document.getElementById('hamburger-btn');
   var mobileNav = document.getElementById('mobile-nav');

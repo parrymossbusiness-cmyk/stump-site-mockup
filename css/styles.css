@@ -140,7 +140,7 @@ section { padding: 64px 0; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 500;
-  background: linear-gradient(to bottom, rgba(10,14,10,0.55) 0%, rgba(10,14,10,0.28) 60%, rgba(10,14,10,0) 100%);
+  background: linear-gradient(to bottom, rgba(10,14,10,0.72) 0%, rgba(10,14,10,0.4) 65%, rgba(10,14,10,0) 100%);
   transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
 .site-header.is-solid {
@@ -162,7 +162,7 @@ section { padding: 64px 0; }
   gap: 10px;
   flex-shrink: 0;
 }
-.logo-icon { width: 34px; height: 34px; flex-shrink: 0; }
+.logo-icon { width: 34px; height: 34px; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)); }
 .logo-icon path { fill: var(--color-amber); }
 .logo-text {
   font-family: var(--font-display);
@@ -170,10 +170,12 @@ section { padding: 64px 0; }
   font-size: 1.15rem;
   letter-spacing: 0.02em;
   color: var(--color-white);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 1px 10px rgba(0,0,0,0.55);
   transition: color 0.25s ease;
 }
 .logo-text .accent { color: var(--color-amber); }
-.site-header.is-solid .logo-text { color: var(--color-charcoal); }
+.site-header.is-solid .logo-text { color: var(--color-charcoal); text-shadow: none; }
+.site-header.is-solid .logo-icon { filter: none; }
 
 /* Primary nav */
 .main-nav { display: none; }
@@ -501,21 +503,24 @@ section { padding: 64px 0; }
 }
 
 @media (max-width: 767px) {
-  /* Full-bleed to the true bottom of the screen. 100svh locks to the
-     *smallest* possible viewport (Safari's toolbar fully expanded) — when
-     the toolbar later collapses to its compact floating state, the real
-     visible area is taller than that, leaving a gap of the next section's
-     white background peeking through above the toolbar. 100dvh tracks the
-     toolbar's actual current state instead, so it always matches; the svh
-     line stays first as a fallback for browsers without dvh support.
+  /* Full-bleed to the true bottom of the screen. 100svh/100dvh are the CSS
+     fallbacks (in case JS hasn't run yet), but WebKit has documented
+     inconsistencies recalculating dvh once Safari's toolbar collapses to
+     its compact floating state mid-session, which is what was leaving a
+     gap of the next section's white background peeking through above the
+     toolbar. --hero-vh (set in main.js from window.visualViewport, which
+     Safari keeps accurate to the toolbar's live state) wins as the last,
+     most specific declaration and is what actually drives this in practice.
      hero-stump-poster-mobile.jpg is shot portrait with the stump/machine in
      the upper frame and plain yard below, so a top-biased crop keeps the
      subject fully in view regardless of exact phone aspect ratio. */
   .hero {
     height: 100svh;
     height: 100dvh;
+    height: var(--hero-vh, 100dvh);
     min-height: 100svh;
     min-height: 100dvh;
+    min-height: var(--hero-vh, 100dvh);
   }
   .hero-media img,
   .hero-media video {
